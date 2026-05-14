@@ -35,10 +35,14 @@ class N15Consolidator(HTMLParser):
       IGNORABLE_CLASSES = ["c1", "c7", "c39"]
       if all(c not in IGNORABLE_CLASSES for c in self.current_classes()):
         header = any(re.match(r"h\d", tag) for tag, _classes in self.stack)
-        while len(self.committed_stack) < len(self.stack):
-          self.out += f"<{output_tag(self.stack[len(self.committed_stack)])}\n>"
-          self.committed_stack.append(
-            (len(self.committed_stack), self.stack[len(self.committed_stack)]))
+        for i in range(self.committed_stack[-1][0] + 1 if self.committed_stack
+                           else 0,
+                       len(self.stack)):
+          candidate = self.stack[i]
+          if header and candidate[0] in ("ol", "li"):
+            continue
+          self.out += f"<{output_tag(candidate)}\n>"
+          self.committed_stack.append((i, candidate))
         self.out += data
 
 def output_tag(stack_element : tuple[str, list[str]]):
