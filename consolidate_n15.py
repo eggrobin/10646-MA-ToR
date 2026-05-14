@@ -21,10 +21,9 @@ class N15Consolidator(HTMLParser):
 
     def handle_endtag(self, tag: str):
       if tag in TRACKED_TAGS:
-        i_top = len(self.committed_stack)
         top = self.stack.pop()
-        if i_top == self.committed_stack[-1][0]:
-          self.out += f"</{output_tag(top)}>"
+        if len(self.stack) == self.committed_stack[-1][0]:
+          self.out += f"</{output_tag(top)}\n>"
           self.committed_stack.pop()
         if top[0] != tag:
           print(top, "closed by", tag)
@@ -37,7 +36,7 @@ class N15Consolidator(HTMLParser):
       if all(c not in IGNORABLE_CLASSES for c in self.current_classes()):
         header = any(re.match(r"h\d", tag) for tag, _classes in self.stack)
         while len(self.committed_stack) < len(self.stack):
-          self.out += f"<{output_tag(self.stack[len(self.committed_stack)])}>"
+          self.out += f"<{output_tag(self.stack[len(self.committed_stack)])}\n>"
           self.committed_stack.append(
             (len(self.committed_stack), self.stack[len(self.committed_stack)]))
         self.out += data
