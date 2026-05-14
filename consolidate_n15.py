@@ -56,6 +56,6 @@ def output_tag(stack_element : tuple[str, list[str]]):
 consolidator = N15Consolidator()
 with open("DRAFT10646MAbicameralToR.docx.html", encoding="utf8") as f:
   consolidator.feed(f.read())
-with open("N15.html", "w", encoding="utf8") as out:
+with open("consolidated-N15.html", "w", encoding="utf8") as out:
   out.write("<meta charset=utf-8>\n")
   out.write(consolidator.out)
