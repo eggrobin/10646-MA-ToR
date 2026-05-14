@@ -41,6 +41,8 @@ class N15Consolidator(HTMLParser):
           candidate = self.stack[i]
           if header and candidate[0] in ("ol", "li"):
             continue
+          if output_tag(candidate) == "span":
+            continue
           self.out += f"<{output_tag(candidate)}\n>"
           self.committed_stack.append((i, candidate))
         self.out += data
