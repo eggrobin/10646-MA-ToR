@@ -7,7 +7,7 @@ class N15Consolidator(HTMLParser):
     def __init__(self):
       super().__init__()
       self.stack : list[tuple[str, list[str]]] = []
-      self.committed_stack = []
+      self.committed_stack : list[tuple[int, tuple[str, list[str]]]] = []
       self.out = ""
 
     def current_classes(self):
@@ -21,8 +21,9 @@ class N15Consolidator(HTMLParser):
 
     def handle_endtag(self, tag: str):
       if tag in TRACKED_TAGS:
+        i_top = len(self.committed_stack)
         top = self.stack.pop()
-        if len(self.committed_stack) > len(self.stack):
+        if i_top == self.committed_stack[-1][0]:
           self.out += f"</{output_tag(top)}>"
           self.committed_stack.pop()
         if top[0] != tag:
@@ -37,7 +38,8 @@ class N15Consolidator(HTMLParser):
         header = any(re.match(r"h\d", tag) for tag, _classes in self.stack)
         while len(self.committed_stack) < len(self.stack):
           self.out += f"<{output_tag(self.stack[len(self.committed_stack)])}>"
-          self.committed_stack.append(self.stack[len(self.committed_stack)])
+          self.committed_stack.append(
+            (len(self.committed_stack), self.stack[len(self.committed_stack)]))
         self.out += data
 
 def output_tag(stack_element : tuple[str, list[str]]):
